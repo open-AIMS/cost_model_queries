@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
-import LM_diagnostics as lmd
+import plotting.LM_diagnostics as lmd
 
-from data_plotting import plot_scatter_xy, plot_y_v_y
+from plotting.data_plotting import plot_scatter_xy, plot_y_v_y
 
 samples_fn = 'CAD_model_samples_run2.csv'
 samples_df = pd.read_csv(samples_fn)
