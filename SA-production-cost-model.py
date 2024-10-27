@@ -31,7 +31,7 @@ problem_dict = {'num_vars': len(is_cat), 'names': factor_names, 'bounds':[*facto
 sp = ProblemSpec(problem_dict)
 
 sp.samples=np.array(samples_df[factor_names])
-breakpoint()
+
 # First get sensitivity to setup cost
 sp.set_results(np.array(samples_df['setupCost']))
 sp.analyze_sobol()

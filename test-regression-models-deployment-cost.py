@@ -42,7 +42,6 @@ cls.residual_plot()
 cls.qq_plot()
 cls.scale_location_plot()
 
-breakpoint()
 # Plot pred against actual
 pred_var = res.get_prediction().summary_frame()["mean"]
 ax,fig = plot_y_v_y(np.exp(x.Cost), np.exp(pred_var))

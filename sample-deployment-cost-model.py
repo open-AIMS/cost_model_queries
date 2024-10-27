@@ -3,12 +3,16 @@ import numpy as np
 import pandas as pd
 
 import decimal
-# import SALib
+import os
 from SALib.analyze.sobol import analyze
 from SALib.sample.sobol import sample
 from SALib import ProblemSpec
 
 import matplotlib.pyplot as plt
+
+# Path to cost model
+file_name =  "\\Cost Models\\3.5.3 CA Deployment Model.xlsx"
+wb_file_path =  os.path.abspath(os.getcwd())+file_name
 
 # Generate sample
 N = 2**10
@@ -36,7 +40,7 @@ sp = ProblemSpec(problem_dict)
 sp.sample_sobol(N, calc_second_order=True)
 
 xlApp = win32com.client.Dispatch("Excel.Application")
-wb = xlApp.Workbooks.Open("C:\\Users\\rcrocker\\Documents\\Github\\cost-model-queries\\Cost Models\\3.5.3 CA Deployment Model.xlsx")
+wb = xlApp.Workbooks.Open(wb_file_path)
 
 def new_deploy_cost_calc(wb, val_df, idx):
     ws = wb.Sheets("Dashboard")

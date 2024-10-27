@@ -34,7 +34,7 @@ x = x.drop(x[fill_vec].index)
 ols_model = smf.ols(formula=formula, data=x)
 res = ols_model.fit()
 print(res.summary())
-breakpoint()
+
 # Plot diagnostics
 cls = lmd.LinearRegDiagnostic(res)
 cls.residual_plot()

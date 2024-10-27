@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 
-# import SALib
 from SALib.analyze.sobol import analyze
 from SALib.sample.sobol import sample
 from SALib import ProblemSpec
@@ -30,7 +29,7 @@ factor_names = [*factor_dict.keys()]
 problem_dict = {'num_vars': len(is_cat), 'names': factor_names, 'bounds':[*factor_dict.values()]}
 sp = ProblemSpec(problem_dict)
 sp.samples=np.array(samples_df[factor_names])
-breakpoint()
+
 # First get sensitivity to setup cost
 sp.set_results(np.array(samples_df['setupCost']))
 sp.analyze_sobol()
