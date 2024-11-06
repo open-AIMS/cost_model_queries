@@ -3,6 +3,13 @@ import numpy as np
 
 
 def plot_scatter_xy(data_frame, y):
+    """
+    Plot a series of factors in a dataframe against an output y.
+
+    Args:
+        data_frame : Dataframe of sampled factors
+        y : Vector of outputs following sampling using the data_frame
+    """
     num_rows = int((np.ceil(data_frame.shape[1]) / 2)) + 1 * np.mod(
         data_frame.shape[1], 2
     )
@@ -22,6 +29,13 @@ def plot_scatter_xy(data_frame, y):
 
 
 def plot_y_v_y(y, y_hat):
+    """
+    Plot predicted cost y_hat against actual cost y.
+
+    Args:
+        y : Actual y
+        y_hat : Predicted y
+    """
     ymax = max(max(y), max(y_hat))
     fig, ax = plt.subplots(1, 1)
     ax.scatter(y, y_hat, alpha=0.5)
