@@ -1,30 +1,45 @@
 import decimal
 from SALib import ProblemSpec
 import numpy as np
+import pandas
 
 
-def calculate_deployment_cost(wb, val_df, idx):
+def calculate_deployment_cost(wb, factors):
+    """
+    Calculates set up and operational costs in the deployment cost model (wb), given a set of parameters to sample.
+
+    Args:
+        wb : The cost model as an excel workbook
+        factors : Row of a pandas dataframe with factors to sample
+
+    Returns:
+        Cost: Operational cost
+        setupCost: Setup cost
+        percoral_Cost: Operational cost per 1YO coral
+        percoral_setupCost: Setup cost per 1YO coral
+        YOEC_yield: Number of 1YO corals produced
+    """
     ws = wb.Sheets("Dashboard")
     reef_key = ["Moore", "Davies", "Swains", "Keppel"]
-    ws.Cells(5, 4).Value = val_df["num_devices"][idx]
-    ws.Cells(6, 4).Value = reef_key[val_df["port"][idx] - 1]
-    ws.Cells(9, 4).Value = val_df["DAJ_a_r"][idx]
-    ws.Cells(10, 4).Value = val_df["DAJ_c_s"][idx]
-    ws.Cells(13, 4).Value = val_df["deck_space"][idx]
+    ws.Cells(5, 4).Value = factors["num_devices"]
+    ws.Cells(6, 4).Value = reef_key[factors["port"] - 1]
+    ws.Cells(9, 4).Value = factors["DAJ_a_r"]
+    ws.Cells(10, 4).Value = factors["DAJ_c_s"]
+    ws.Cells(13, 4).Value = factors["deck_space"]
 
     ws_2 = wb.Sheets("Lookup Tables")
-    ws_2.Cells(19, 7).Value = val_df["cape_ferg_price"][idx]
-    ws_2.Cells(19, 15).Value = val_df["ship_endurance"][idx]
-    ws_2.Cells(54 + val_df["port"][idx], 8).Value = val_df["distance_from_port"][idx]
+    ws_2.Cells(19, 7).Value = factors["cape_ferg_price"]
+    ws_2.Cells(19, 15).Value = factors["ship_endurance"]
+    ws_2.Cells(54 + factors["port"], 8).Value = factors["distance_from_port"]
 
     ws_3 = wb.Sheets("Conversions")
-    ws_3.Cells(25, 5).Value = val_df["1YOEC_yield"][idx]
+    ws_3.Cells(25, 5).Value = factors["1YOEC_yield"]
 
     ws_4 = wb.Sheets("Logistics")
-    ws_4.Cells(84, 6).Value = val_df["secs_per_dev"][idx]
-    ws_4.Cells(84, 9).Value = val_df["proportion"][idx]
-    ws_4.Cells(83, 9).Value = val_df["bins_per_tender"][idx]
-    ws_4.Cells(38, 4).Value = val_df["deployment_dur"][idx]
+    ws_4.Cells(84, 6).Value = factors["secs_per_dev"]
+    ws_4.Cells(84, 9).Value = factors["proportion"]
+    ws_4.Cells(83, 9).Value = factors["bins_per_tender"]
+    ws_4.Cells(38, 4).Value = factors["deployment_dur"]
 
     ws.EnableCalculation = True
     ws.Calculate()
@@ -40,24 +55,38 @@ def calculate_deployment_cost(wb, val_df, idx):
     return [Cost, setupCost, percoral_Cost, percoral_setupCost, YOEC_yield]
 
 
-def calculate_production_cost(wb, val_df, idx):
+def calculate_production_cost(wb, factors):
+    """
+    Calculates set up and operational costs in the production cost model (wb), given a set of parameters to sample.
+
+    Args:
+        wb : The cost model as an excel workbook
+        factors : Row of a pandas dataframe with factors to sample
+
+    Returns:
+        Cost: Operational cost
+        setupCost: Setup cost
+        percoral_Cost: Operational cost per 1YO coral
+        percoral_setupCost: Setup cost per 1YO coral
+        YOEC_yield: Number of 1YO corals produced
+    """
     ws = wb.Sheets("Dashboard")
-    ws.Cells(5, 5).Value = val_df["num_devices"][idx]
-    ws.Cells(10, 5).Value = val_df["species_no"][idx]
+    ws.Cells(5, 5).Value = factors["num_devices"]
+    ws.Cells(10, 5).Value = factors["species_no"]
 
     ws_3 = wb.Sheets("Conversions")
-    ws_3.Cells(7, 6).Value = val_df["col_spawn_gam_bun"][idx]
-    ws_3.Cells(8, 7).Value = val_df["gam_bun_egg"][idx]
-    ws_3.Cells(9, 8).Value = val_df["egg_embryo"][idx]
-    ws_3.Cells(10, 9).Value = val_df["embryo_freeswim"][idx]
-    ws_3.Cells(11, 10).Value = val_df["freeswim_settle"][idx]
-    ws_3.Cells(12, 11).Value = val_df["settle_just"][idx]
-    ws_3.Cells(14, 11).Value = val_df["just_unit"][idx]
-    ws_3.Cells(14, 15).Value = val_df["just_mature"][idx]
-    ws_3.Cells(19, 18).Value = val_df["1YOEC_yield"][idx]
+    ws_3.Cells(7, 6).Value = factors["col_spawn_gam_bun"]
+    ws_3.Cells(8, 7).Value = factors["gam_bun_egg"]
+    ws_3.Cells(9, 8).Value = factors["egg_embryo"]
+    ws_3.Cells(10, 9).Value = factors["embryo_freeswim"]
+    ws_3.Cells(11, 10).Value = factors["freeswim_settle"]
+    ws_3.Cells(12, 11).Value = factors["settle_just"]
+    ws_3.Cells(14, 11).Value = factors["just_unit"]
+    ws_3.Cells(14, 15).Value = factors["just_mature"]
+    ws_3.Cells(19, 18).Value = factors["1YOEC_yield"]
 
     ws_4 = wb.Sheets("Logistics")
-    ws_4.Cells(11, 5).Value = val_df["optimal_rear_dens"][idx]
+    ws_4.Cells(11, 5).Value = factors["optimal_rear_dens"]
 
     ws.EnableCalculation = True
     ws.Calculate()
@@ -73,17 +102,35 @@ def calculate_production_cost(wb, val_df, idx):
 
 
 def _problem_spec(factor_dict, is_cat):
+    """
+    Create a problem specification for sampling using SALib.
+
+    Args:
+        factor_dict : A dictionary of factor names and ranges
+        is_cat : Boolian vector specifian whether each factor is categorical
+
+    Returns:
+        sp: ProblemSpec for sampling with SALib
+        factor_names: List of factor names
+        is_cat: Boolian vector specifian whether each factor is categorical.
+    """
     factor_names = [*factor_dict.keys()]
     problem_dict = {
         "num_vars": len(is_cat),
         "names": factor_names,
         "bounds": [*factor_dict.values()],
     }
-    sp = ProblemSpec(problem_dict)
     return ProblemSpec(problem_dict), factor_names, is_cat
 
 
 def deployment_problem_spec():
+    """
+    Create a problem specification for sampling deployment cost parameters using SALib.
+
+    Args:
+        factor_dict : A dictionary of factor names and ranges
+        is_cat : Boolian vector specifian whether each factor is categorical
+    """
     factor_dict = {
         "num_devices": [1.0, 100000000.0],
         "port": [0.0, 4.0],
@@ -119,6 +166,13 @@ def deployment_problem_spec():
 
 
 def production_problem_spec():
+    """
+    Create a problem specification for sampling production cost parameters using SALib.
+
+    Args:
+        factor_dict : A dictionary of factor names and ranges
+        is_cat : Boolian vector specifian whether each factor is categorical
+    """
     factor_dict = {
         "num_devices": [1.0, 100000000.0],
         "colony_hold_time": [19.0, 23.0],
@@ -152,19 +206,41 @@ def production_problem_spec():
     return _problem_spec(factor_dict, is_cat)
 
 
-def convert_factor_types(factor_df, is_cat):
+def convert_factor_types(factors_df, is_cat):
+    """
+    SALib samples floats, so convert categorical variables to integers by taking the ceiling.
+
+    Args:
+        factors_df : A dataframe of sampled factors
+        is_cat : Boolian vector specifian whether each factor is categorical
+
+    Returns:
+        factors_df: Updated sampled factor dataframe with categorical factors as integers
+    """
     for ic_ind, ic in enumerate(is_cat):
         if ic:
-            factor_df[factor_df.columns[ic_ind]] = np.ceil(
-                factor_df[factor_df.columns[ic_ind]]
+            factors_df[factors_df.columns[ic_ind]] = np.ceil(
+                factors_df[factors_df.columns[ic_ind]]
             ).astype(int)
-    return factor_df
+    return factors_df
 
 
 def _sample_cost(wb, factors_df, N, calculate_cost):
+    """
+    Sample a cost model.
+
+    Args:
+        wb : A cost model as an escel workbook
+        factors_df : Dataframe of ffactors to input in the cost model
+        N: Number of samples input to SALib sampling function
+        calculate_cost: Function to use to sample cost
+
+    Returns:
+        factors_df: Updated sampled factor dataframe with costs added
+    """
     total_cost = np.zeros((N * (2 * (factors_df.shape[1]) + 2), 5))
     for idx_n in range(len(total_cost)):
-        total_cost[idx_n, :] = calculate_cost(wb, factors_df, idx_n)
+        total_cost[idx_n, :] = calculate_cost(wb, factors_df.iloc[idx_n])
 
     factors_df.insert(1, "Cost", total_cost[:, 0])
     factors_df.insert(1, "setupCost", total_cost[:, 1])
@@ -175,8 +251,30 @@ def _sample_cost(wb, factors_df, N, calculate_cost):
 
 
 def sample_deployment_cost(wb, factors_df, N):
+    """
+    Sample the deployment cost model.
+
+    Args:
+        wb : A cost model as an escel workbook
+        factors_df : Dataframe of ffactors to input in the cost model
+        N: Number of samples input to SALib sampling function
+
+    Returns:
+        factors_df: Updated sampled factor dataframe with costs added
+    """
     return _sample_cost(wb, factors_df, N, calculate_deployment_cost)
 
 
 def sample_production_cost(wb, factors_df, N):
+    """
+    Sample the production cost model.
+
+    Args:
+        wb : A cost model as an escel workbook
+        factors_df : Dataframe of ffactors to input in the cost model
+        N: Number of samples input to SALib sampling function
+
+    Returns:
+        factors_df: Updated sampled factor dataframe with costs added
+    """
     return _sample_cost(wb, factors_df, N, calculate_production_cost)
