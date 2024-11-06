@@ -6,7 +6,7 @@ from SALib.sample.sobol import sample
 
 import matplotlib.pyplot as plt
 
-from sampling_functions import deployment_problem_spec
+from sampling.sampling_functions import deployment_problem_spec
 
 # Load samples for deployment cost
 samples_fn = "deployment_cost_samples.csv"

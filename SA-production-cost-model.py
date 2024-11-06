@@ -6,7 +6,7 @@ from SALib.sample.sobol import sample
 
 import matplotlib.pyplot as plt
 
-from sampling_functions import production_problem_spec
+from sampling.sampling_functions import production_problem_spec
 
 samples_fn = "production_cost_samples.csv"
 samples_df = pd.read_csv(samples_fn)
