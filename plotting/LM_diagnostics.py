@@ -8,9 +8,10 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 import matplotlib.pyplot as plt
 from typing import Type
 
-style_talk = 'seaborn-talk'    #refer to plt.style.available
+style_talk = "seaborn-talk"  # refer to plt.style.available
 
-class LinearRegDiagnostic():
+
+class LinearRegDiagnostic:
     """
     Diagnostic plots to identify potential problems in a linear regression fit.
     Mainly,
@@ -44,8 +45,10 @@ class LinearRegDiagnostic():
         (7) Fixed Residuals vs Leverage legend to work with loc='best'
     """
 
-    def __init__(self,
-                 results: Type[statsmodels.regression.linear_model.RegressionResultsWrapper]) -> None:
+    def __init__(
+        self,
+        results: Type[statsmodels.regression.linear_model.RegressionResultsWrapper],
+    ) -> None:
         """
         For a linear regression model, generates following diagnostic plots:
 
@@ -87,8 +90,15 @@ class LinearRegDiagnostic():
         >>> cls.vif_table()
         """
 
-        if isinstance(results, statsmodels.regression.linear_model.RegressionResultsWrapper) is False:
-            raise TypeError("result must be instance of statsmodels.regression.linear_model.RegressionResultsWrapper object")
+        if (
+            isinstance(
+                results, statsmodels.regression.linear_model.RegressionResultsWrapper
+            )
+            is False
+        ):
+            raise TypeError(
+                "result must be instance of statsmodels.regression.linear_model.RegressionResultsWrapper object"
+            )
 
         self.results = maybe_unwrap_results(results)
 
@@ -105,23 +115,28 @@ class LinearRegDiagnostic():
         self.nparams = len(self.results.params)
         self.nresids = len(self.residual_norm)
 
-    def __call__(self, plot_context='seaborn-v0_8-paper', **kwargs):
+    def __call__(self, plot_context="seaborn-v0_8-paper", **kwargs):
         # print(plt.style.available)
         # GH#9157
         if plot_context not in plt.style.available:
-            plot_context = 'default'
+            plot_context = "default"
         with plt.style.context(plot_context):
-            fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10,10))
-            self.residual_plot(ax=ax[0,0])
-            self.qq_plot(ax=ax[0,1])
-            self.scale_location_plot(ax=ax[1,0])
+            fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
+            self.residual_plot(ax=ax[0, 0])
+            self.qq_plot(ax=ax[0, 1])
+            self.scale_location_plot(ax=ax[1, 0])
             self.leverage_plot(
-                ax=ax[1,1],
-                high_leverage_threshold = kwargs.get('high_leverage_threshold'),
-                cooks_threshold = kwargs.get('cooks_threshold'))
+                ax=ax[1, 1],
+                high_leverage_threshold=kwargs.get("high_leverage_threshold"),
+                cooks_threshold=kwargs.get("cooks_threshold"),
+            )
             plt.show()
 
-        return self.vif_table(), fig, ax,
+        return (
+            self.vif_table(),
+            fig,
+            ax,
+        )
 
     def residual_plot(self, ax=None):
         """
@@ -137,23 +152,21 @@ class LinearRegDiagnostic():
             x=self.y_predict,
             y=self.residual,
             lowess=True,
-            scatter_kws={'alpha': 0.5},
-            line_kws={'color': 'red', 'lw': 1, 'alpha': 0.8},
-            ax=ax)
+            scatter_kws={"alpha": 0.5},
+            line_kws={"color": "red", "lw": 1, "alpha": 0.8},
+            ax=ax,
+        )
 
         # annotations
         residual_abs = np.abs(self.residual)
         abs_resid = np.flip(np.argsort(residual_abs), 0)
         abs_resid_top_3 = abs_resid[:10]
         for i in abs_resid_top_3:
-            ax.annotate(
-                i,
-                xy=(self.y_predict[i], self.residual[i]),
-                color='C3')
+            ax.annotate(i, xy=(self.y_predict[i], self.residual[i]), color="C3")
 
-        ax.set_title('Residuals vs Fitted', fontweight="bold")
-        ax.set_xlabel('Fitted values')
-        ax.set_ylabel('Residuals')
+        ax.set_title("Residuals vs Fitted", fontweight="bold")
+        ax.set_xlabel("Fitted values")
+        ax.set_ylabel("Residuals")
         return ax
 
     def qq_plot(self, ax=None):
@@ -167,21 +180,19 @@ class LinearRegDiagnostic():
             fig, ax = plt.subplots()
 
         QQ = ProbPlot(self.residual_norm)
-        fig = QQ.qqplot(line='45', alpha=0.5, lw=1, ax=ax)
+        fig = QQ.qqplot(line="45", alpha=0.5, lw=1, ax=ax)
 
         # annotations
         abs_norm_resid = np.flip(np.argsort(np.abs(self.residual_norm)), 0)
         abs_norm_resid_top_3 = abs_norm_resid[:10]
-        for i, x, y in self.__qq_top_resid(QQ.theoretical_quantiles, abs_norm_resid_top_3):
-            ax.annotate(
-                i,
-                xy=(x, y),
-                ha='right',
-                color='C3')
+        for i, x, y in self.__qq_top_resid(
+            QQ.theoretical_quantiles, abs_norm_resid_top_3
+        ):
+            ax.annotate(i, xy=(x, y), ha="right", color="C3")
 
-        ax.set_title('Normal Q-Q', fontweight="bold")
-        ax.set_xlabel('Theoretical Quantiles')
-        ax.set_ylabel('Standardized Residuals')
+        ax.set_title("Normal Q-Q", fontweight="bold")
+        ax.set_xlabel("Theoretical Quantiles")
+        ax.set_ylabel("Standardized Residuals")
         return ax
 
     def scale_location_plot(self, ax=None):
@@ -196,30 +207,33 @@ class LinearRegDiagnostic():
 
         residual_norm_abs_sqrt = np.sqrt(np.abs(self.residual_norm))
 
-        ax.scatter(self.y_predict, residual_norm_abs_sqrt, alpha=0.5);
+        ax.scatter(self.y_predict, residual_norm_abs_sqrt, alpha=0.5)
         sns.regplot(
             x=self.y_predict,
             y=residual_norm_abs_sqrt,
-            scatter=False, ci=False,
+            scatter=False,
+            ci=False,
             lowess=True,
-            line_kws={'color': 'red', 'lw': 1, 'alpha': 0.8},
-            ax=ax)
+            line_kws={"color": "red", "lw": 1, "alpha": 0.8},
+            ax=ax,
+        )
 
         # annotations
         abs_sq_norm_resid = np.flip(np.argsort(residual_norm_abs_sqrt), 0)
         abs_sq_norm_resid_top_3 = abs_sq_norm_resid[:10]
         for i in abs_sq_norm_resid_top_3:
             ax.annotate(
-                i,
-                xy=(self.y_predict[i], residual_norm_abs_sqrt[i]),
-                color='C3')
+                i, xy=(self.y_predict[i], residual_norm_abs_sqrt[i]), color="C3"
+            )
 
-        ax.set_title('Scale-Location', fontweight="bold")
-        ax.set_xlabel('Fitted values')
-        ax.set_ylabel(r'$\sqrt{|\mathrm{Standardized\ Residuals}|}$');
+        ax.set_title("Scale-Location", fontweight="bold")
+        ax.set_xlabel("Fitted values")
+        ax.set_ylabel(r"$\sqrt{|\mathrm{Standardized\ Residuals}|}$")
         return ax
 
-    def leverage_plot(self, ax=None, high_leverage_threshold=False, cooks_threshold='baseR'):
+    def leverage_plot(
+        self, ax=None, high_leverage_threshold=False, cooks_threshold="baseR"
+    ):
         """
         Residual vs Leverage plot
 
@@ -230,10 +244,7 @@ class LinearRegDiagnostic():
         if ax is None:
             fig, ax = plt.subplots()
 
-        ax.scatter(
-            self.leverage,
-            self.residual_norm,
-            alpha=0.5);
+        ax.scatter(self.leverage, self.residual_norm, alpha=0.5)
 
         sns.regplot(
             x=self.leverage,
@@ -241,44 +252,46 @@ class LinearRegDiagnostic():
             scatter=False,
             ci=False,
             lowess=True,
-            line_kws={'color': 'red', 'lw': 1, 'alpha': 0.8},
-            ax=ax)
+            line_kws={"color": "red", "lw": 1, "alpha": 0.8},
+            ax=ax,
+        )
 
         # annotations
         leverage_top_3 = np.flip(np.argsort(self.cooks_distance), 0)[:10]
         for i in leverage_top_3:
-            ax.annotate(
-                i,
-                xy=(self.leverage[i], self.residual_norm[i]),
-                color = 'C3')
+            ax.annotate(i, xy=(self.leverage[i], self.residual_norm[i]), color="C3")
 
         factors = []
-        if cooks_threshold == 'baseR' or cooks_threshold is None:
+        if cooks_threshold == "baseR" or cooks_threshold is None:
             factors = [1, 0.5]
-        elif cooks_threshold == 'convention':
-            factors = [4/self.nresids]
-        elif cooks_threshold == 'dof':
-            factors = [4/ (self.nresids - self.nparams)]
+        elif cooks_threshold == "convention":
+            factors = [4 / self.nresids]
+        elif cooks_threshold == "dof":
+            factors = [4 / (self.nresids - self.nparams)]
         else:
-            raise ValueError("threshold_method must be one of the following: 'convention', 'dof', or 'baseR' (default)")
+            raise ValueError(
+                "threshold_method must be one of the following: 'convention', 'dof', or 'baseR' (default)"
+            )
         for i, factor in enumerate(factors):
             label = "Cook's distance" if i == 0 else None
             xtemp, ytemp = self.__cooks_dist_line(factor)
-            ax.plot(xtemp, ytemp, label=label, lw=1.25, ls='--', color='red')
-            ax.plot(xtemp, np.negative(ytemp), lw=1.25, ls='--', color='red')
+            ax.plot(xtemp, ytemp, label=label, lw=1.25, ls="--", color="red")
+            ax.plot(xtemp, np.negative(ytemp), lw=1.25, ls="--", color="red")
 
         if high_leverage_threshold:
             high_leverage = 2 * self.nparams / self.nresids
             if max(self.leverage) > high_leverage:
-                ax.axvline(high_leverage, label='High leverage', ls='-.', color='purple', lw=1)
+                ax.axvline(
+                    high_leverage, label="High leverage", ls="-.", color="purple", lw=1
+                )
 
-        ax.axhline(0, ls='dotted', color='black', lw=1.25)
-        ax.set_xlim(0, max(self.leverage)+0.01)
-        ax.set_ylim(min(self.residual_norm)-0.1, max(self.residual_norm)+0.1)
-        ax.set_title('Residuals vs Leverage', fontweight="bold")
-        ax.set_xlabel('Leverage')
-        ax.set_ylabel('Standardized Residuals')
-        plt.legend(loc='best')
+        ax.axhline(0, ls="dotted", color="black", lw=1.25)
+        ax.set_xlim(0, max(self.leverage) + 0.01)
+        ax.set_ylim(min(self.residual_norm) - 0.1, max(self.residual_norm) + 0.1)
+        ax.set_title("Residuals vs Leverage", fontweight="bold")
+        ax.set_xlabel("Leverage")
+        ax.set_ylabel("Standardized Residuals")
+        plt.legend(loc="best")
         return ax
 
     def vif_table(self):
@@ -291,12 +304,11 @@ class LinearRegDiagnostic():
         """
         vif_df = pd.DataFrame()
         vif_df["Features"] = self.xvar_names
-        vif_df["VIF Factor"] = [variance_inflation_factor(self.xvar, i) for i in range(self.xvar.shape[1])]
+        vif_df["VIF Factor"] = [
+            variance_inflation_factor(self.xvar, i) for i in range(self.xvar.shape[1])
+        ]
 
-        return (vif_df
-                .sort_values("VIF Factor")
-                .round(2))
-
+        return vif_df.sort_values("VIF Factor").round(2)
 
     def get_influence_ids(self, n_i=10):
         """
@@ -319,7 +331,6 @@ class LinearRegDiagnostic():
         y = formula(x)
         return x, y
 
-
     def __qq_top_resid(self, quantiles, top_residual_indices):
         """
         Helper generator function yielding the index and coordinates
@@ -334,7 +345,11 @@ class LinearRegDiagnostic():
                 offset += 1
             else:
                 quant_index -= offset
-            x = quantiles[quant_index] if is_negative else np.flip(quantiles, 0)[quant_index]
+            x = (
+                quantiles[quant_index]
+                if is_negative
+                else np.flip(quantiles, 0)[quant_index]
+            )
             quant_index += 1
             previous_is_negative = is_negative
             yield resid_index, x, y

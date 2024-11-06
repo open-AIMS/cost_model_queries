@@ -2,14 +2,18 @@ import win32com.client
 import pandas as pd
 import os
 
-from sampling_functions import deployment_problem_spec, convert_factor_types, sample_deployment_cost
+from sampling_functions import (
+    deployment_problem_spec,
+    convert_factor_types,
+    sample_deployment_cost,
+)
 
 # Filename for saved samples
-samples_save_fn = 'deployment_cost_samples.csv'
+samples_save_fn = "deployment_cost_samples.csv"
 
 # Path to cost model
-file_name =  "\\Cost Models\\3.5.3 CA Deployment Model.xlsx"
-wb_file_path =  os.path.abspath(os.getcwd())+file_name
+file_name = "\\Cost Models\\3.5.3 CA Deployment Model.xlsx"
+wb_file_path = os.path.abspath(os.getcwd()) + file_name
 
 # Generate sample
 N = 2**10
@@ -25,8 +29,8 @@ factors_df = pd.DataFrame(data=sp.samples, columns=factor_names)
 factors_df = convert_factor_types(factors_df, is_cat)
 
 # Sample cost using factors sampled
-xlApp = win32com.client.Dispatch("Excel.Application") # Open workbook
+xlApp = win32com.client.Dispatch("Excel.Application")  # Open workbook
 wb = xlApp.Workbooks.Open(wb_file_path)
 factors_df = sample_deployment_cost(wb, factors_df, N)
-factors_df.to_csv(samples_save_fn, index=False) # Save to CSV
-wb.Close(True) # Close workbook
+factors_df.to_csv(samples_save_fn, index=False)  # Save to CSV
+wb.Close(True)  # Close workbook
