@@ -21,25 +21,26 @@ def calculate_deployment_cost(wb, factors):
     """
     ws = wb.Sheets("Dashboard")
     reef_key = ["Moore", "Davies", "Swains", "Keppel"]
-    ws.Cells(5, 4).Value = factors["num_devices"]
-    ws.Cells(6, 4).Value = reef_key[factors["port"] - 1]
-    ws.Cells(9, 4).Value = factors["DAJ_a_r"]
-    ws.Cells(10, 4).Value = factors["DAJ_c_s"]
-    ws.Cells(13, 4).Value = factors["deck_space"]
+    port = factors["port"].iloc[0]
+    ws.Cells(5, 4).Value = factors["num_devices"].iloc[0]
+    ws.Cells(6, 4).Value = reef_key[port - 1]
+    ws.Cells(9, 4).Value = factors["DAJ_a_r"].iloc[0]
+    ws.Cells(10, 4).Value = factors["DAJ_c_s"].iloc[0]
+    ws.Cells(13, 4).Value = factors["deck_space"].iloc[0]
 
     ws_2 = wb.Sheets("Lookup Tables")
-    ws_2.Cells(19, 7).Value = factors["cape_ferg_price"]
-    ws_2.Cells(19, 15).Value = factors["ship_endurance"]
-    ws_2.Cells(54 + factors["port"], 8).Value = factors["distance_from_port"]
+    ws_2.Cells(19, 7).Value = factors["cape_ferg_price"].iloc[0]
+    ws_2.Cells(19, 15).Value = factors["ship_endurance"].iloc[0]
+    ws_2.Cells(54 + port, 8).Value = factors["distance_from_port"].iloc[0]
 
     ws_3 = wb.Sheets("Conversions")
-    ws_3.Cells(25, 5).Value = factors["1YOEC_yield"]
+    ws_3.Cells(25, 5).Value = factors["1YOEC_yield"].iloc[0]
 
     ws_4 = wb.Sheets("Logistics")
-    ws_4.Cells(84, 6).Value = factors["secs_per_dev"]
-    ws_4.Cells(84, 9).Value = factors["proportion"]
-    ws_4.Cells(83, 9).Value = factors["bins_per_tender"]
-    ws_4.Cells(38, 4).Value = factors["deployment_dur"]
+    ws_4.Cells(84, 6).Value = factors["secs_per_dev"].iloc[0]
+    ws_4.Cells(84, 9).Value = factors["proportion"].iloc[0]
+    ws_4.Cells(83, 9).Value = factors["bins_per_tender"].iloc[0]
+    ws_4.Cells(38, 4).Value = factors["deployment_dur"].iloc[0]
 
     ws.EnableCalculation = True
     ws.Calculate()
@@ -71,22 +72,22 @@ def calculate_production_cost(wb, factors):
         YOEC_yield: Number of 1YO corals produced
     """
     ws = wb.Sheets("Dashboard")
-    ws.Cells(5, 5).Value = factors["num_devices"]
-    ws.Cells(10, 5).Value = factors["species_no"]
+    ws.Cells(5, 5).Value = factors["num_devices"].iloc[0]
+    ws.Cells(10, 5).Value = factors["species_no"].iloc[0]
 
     ws_3 = wb.Sheets("Conversions")
-    ws_3.Cells(7, 6).Value = factors["col_spawn_gam_bun"]
-    ws_3.Cells(8, 7).Value = factors["gam_bun_egg"]
-    ws_3.Cells(9, 8).Value = factors["egg_embryo"]
-    ws_3.Cells(10, 9).Value = factors["embryo_freeswim"]
-    ws_3.Cells(11, 10).Value = factors["freeswim_settle"]
-    ws_3.Cells(12, 11).Value = factors["settle_just"]
-    ws_3.Cells(14, 11).Value = factors["just_unit"]
-    ws_3.Cells(14, 15).Value = factors["just_mature"]
-    ws_3.Cells(19, 18).Value = factors["1YOEC_yield"]
+    ws_3.Cells(7, 6).Value = factors["col_spawn_gam_bun"].iloc[0]
+    ws_3.Cells(8, 7).Value = factors["gam_bun_egg"].iloc[0]
+    ws_3.Cells(9, 8).Value = factors["egg_embryo"].iloc[0]
+    ws_3.Cells(10, 9).Value = factors["embryo_freeswim"].iloc[0]
+    ws_3.Cells(11, 10).Value = factors["freeswim_settle"].iloc[0]
+    ws_3.Cells(12, 11).Value = factors["settle_just"].iloc[0]
+    ws_3.Cells(14, 11).Value = factors["just_unit"].iloc[0]
+    ws_3.Cells(14, 15).Value = factors["just_mature"].iloc[0]
+    ws_3.Cells(19, 18).Value = factors["1YOEC_yield"].iloc[0]
 
     ws_4 = wb.Sheets("Logistics")
-    ws_4.Cells(11, 5).Value = factors["optimal_rear_dens"]
+    ws_4.Cells(11, 5).Value = factors["optimal_rear_dens"].iloc[0]
 
     ws.EnableCalculation = True
     ws.Calculate()
@@ -222,6 +223,7 @@ def convert_factor_types(factors_df, is_cat):
             factors_df[factors_df.columns[ic_ind]] = np.ceil(
                 factors_df[factors_df.columns[ic_ind]]
             ).astype(int)
+
     return factors_df
 
 
@@ -240,7 +242,7 @@ def _sample_cost(wb, factors_df, N, calculate_cost):
     """
     total_cost = np.zeros((N * (2 * (factors_df.shape[1]) + 2), 5))
     for idx_n in range(len(total_cost)):
-        total_cost[idx_n, :] = calculate_cost(wb, factors_df.iloc[idx_n])
+        total_cost[idx_n, :] = calculate_cost(wb, factors_df.iloc[[idx_n]])
 
     factors_df.insert(1, "Cost", total_cost[:, 0])
     factors_df.insert(1, "setupCost", total_cost[:, 1])
