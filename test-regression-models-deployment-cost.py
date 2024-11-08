@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 import plotting.LM_diagnostics as lmd
 
-from plotting.data_plotting import plot_scatter_xy, plot_y_v_y
+from plotting.data_plotting import plot_predictors, plot_predicted_vs_actual
 
 samples_fn = "deployment_cost_samples.csv"
 samples_df = pd.read_csv(samples_fn)
@@ -22,7 +22,7 @@ init_x["port"] = init_x["port"].astype("category")
 init_x["YOEC_yield"] = init_x["1YOEC_yield"]
 
 # General review of potential relationships/correlations
-ax, fig = plot_scatter_xy(init_x, samples_df.Cost)
+ax, fig = plot_predictors(init_x, samples_df.Cost)
 fig.show()
 
 ### Model for Cost ###
@@ -51,12 +51,12 @@ cls.scale_location_plot()
 
 # Plot pred against actual
 pred_var = res.get_prediction().summary_frame()["mean"]
-ax, fig = plot_y_v_y(np.exp(x.Cost), np.exp(pred_var))
+ax, fig = plot_predicted_vs_actual(np.exp(x.Cost), np.exp(pred_var))
 fig.show()
 
 ### Model for setupCost ###
 # General review of potential relationships/correlations
-ax, fig = plot_scatter_xy(init_x, samples_df.setupCost)
+ax, fig = plot_predictors(init_x, samples_df.setupCost)
 fig.show()
 
 formula = "setupCost ~ 0 + np.log(num_devices) + DAJ_a_r + DAJ_c_s + deck_space + np.log(distance_from_port) + secs_per_dev + bins_per_tender + proportion"
@@ -84,5 +84,5 @@ cls.scale_location_plot()
 
 # Plot pred against actual
 pred_var = res.get_prediction().summary_frame()["mean"]
-ax, fig = plot_y_v_y(np.exp(x.setupCost), np.exp(pred_var))
+ax, fig = plot_predicted_vs_actual(np.exp(x.setupCost), np.exp(pred_var))
 fig.show()

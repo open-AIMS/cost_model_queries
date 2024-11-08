@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_scatter_xy(data_frame, y):
+def plot_predictors(data_frame, y):
     """
     Plot a series of factors in a dataframe against an output y.
 
@@ -28,7 +28,7 @@ def plot_scatter_xy(data_frame, y):
     return ax, fig
 
 
-def plot_y_v_y(y, y_hat):
+def plot_predicted_vs_actual(y, y_hat):
     """
     Plot predicted cost y_hat against actual cost y.
 

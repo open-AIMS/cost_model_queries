@@ -5,7 +5,7 @@ import statsmodels.formula.api as smf
 import statsmodels.api as sm
 import plotting.LM_diagnostics as lmd
 
-from plotting.data_plotting import plot_scatter_xy, plot_y_v_y
+from plotting.data_plotting import plot_predictors, plot_predicted_vs_actual
 
 samples_fn = "production_cost_samples.csv"
 samples_df = pd.read_csv(samples_fn)
@@ -22,7 +22,7 @@ init_x = samples_df[
 init_x["YOEC_yield"] = init_x["1YOEC_yield"]
 
 # General review of potential relationships/correlations
-ax, fig = plot_scatter_xy(init_x, samples_df.setupCost)
+ax, fig = plot_predictors(init_x, samples_df.setupCost)
 fig.show()
 
 formula = "setupCost ~ 0 + num_devices + species_no"
@@ -49,7 +49,7 @@ cls.qq_plot()
 cls.scale_location_plot()
 
 # Megaphone shape against num_devices suggests weighted least squares to amend heteroscedacity
-ax, fig = plot_scatter_xy(x, res.resid)
+ax, fig = plot_predictors(x, res.resid)
 fig.show()
 
 # First regress abs value of residuals against
@@ -70,7 +70,7 @@ fig.show()
 
 # Plot pred against actual
 pred_var = res_wls.get_prediction().summary_frame()["mean"]
-ax, fig = plot_y_v_y(x.setupCost, pred_var)
+ax, fig = plot_predicted_vs_actual(x.setupCost, pred_var)
 fig.show()
 
 ### Model for Cost ###
@@ -85,7 +85,7 @@ init_x = samples_df[
 init_x["YOEC_yield"] = init_x["1YOEC_yield"]
 
 # General review of potential relationships/correlations
-ax, fig = plot_scatter_xy(init_x, samples_df.Cost)
+ax, fig = plot_predictors(init_x, samples_df.Cost)
 fig.show()
 
 formula = "Cost ~ 0 + num_devices + just_mature"
@@ -101,7 +101,7 @@ cls.qq_plot()
 cls.scale_location_plot()
 
 # Megaphone shape against num_devices suggests weighted least squares to amend heteroscedacity
-ax, fig = plot_scatter_xy(x, np.abs(res.resid))
+ax, fig = plot_predictors(x, np.abs(res.resid))
 fig.show()
 res_ols = sm.OLS(np.abs(res.resid), x.Cost)
 res_fit_res = res_ols.fit()
@@ -120,5 +120,5 @@ fig.show()
 
 # Plot pred against actual
 pred_var = res_wls.get_prediction().summary_frame()["mean"]
-ax, fig = plot_y_v_y(x.Cost, pred_var)
+ax, fig = plot_predicted_vs_actual(x.Cost, pred_var)
 fig.show()
