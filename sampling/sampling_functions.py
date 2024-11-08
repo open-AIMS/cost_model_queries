@@ -1,7 +1,8 @@
 import decimal
 from SALib import ProblemSpec
 import numpy as np
-import pandas
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def calculate_deployment_cost(wb, factors):
@@ -280,3 +281,61 @@ def sample_production_cost(wb, factors_df, N):
         factors_df: Updated sampled factor dataframe with costs added
     """
     return _sample_cost(wb, factors_df, N, calculate_production_cost)
+
+
+def cost_sensitivity_analysis(
+    problem_spec_func, samples_fn, figures_path=".\\figures\\"
+):
+    samples_df = pd.read_csv(samples_fn)
+    sp, factor_names, is_cat = problem_spec_func()
+    sp.samples = np.array(samples_df[factor_names])
+
+    # First get sensitivity to setup cost
+    sp.set_results(np.array(samples_df["setupCost"]))
+    sp.analyze_sobol()
+
+    axes = sp.plot()
+    axes[0].set_yscale("log")
+    fig = plt.gcf()  # get current figure
+    fig.set_size_inches(10, 4)
+    plt.tight_layout()
+    plt.savefig(figures_path + "setup_cost_sobol_SA.png")
+
+    sp.analyze_pawn()
+    axes = sp.plot()
+    fig = plt.gcf()  # get current figure
+    fig.set_size_inches(10, 4)
+    plt.tight_layout()
+    plt.savefig(figures_path + "setup_cost_pawn_barplot_SA.png")
+
+    # SALib.analyze.rsa.analyze(problem_dict, sp.samples, total_cost)
+    sp.heatmap()
+    fig = plt.gcf()  # get current figure
+    fig.set_size_inches(10, 4)
+    plt.savefig(figures_path + "setup_cost_pawn_heatmap_SA.png")
+
+    # Then get sensitivity to operational cost
+    sp.samples = np.array(samples_df[factor_names])
+
+    # Get sensitivity to operational cost
+    sp.set_results(np.array(samples_df["Cost"]))
+    sp.analyze_sobol()
+
+    axes = sp.plot()
+    axes[0].set_yscale("log")
+    fig = plt.gcf()  # get current figure
+    fig.set_size_inches(10, 4)
+    plt.tight_layout()
+    plt.savefig(figures_path + "operational_cost_sobol_SA.png")
+
+    sp.analyze_pawn()
+    axes = sp.plot()
+    fig = plt.gcf()  # get current figure
+    fig.set_size_inches(10, 4)
+    plt.tight_layout()
+    plt.savefig(figures_path + "operational_cost_pawn_barplot_SA.png")
+
+    # SALib.analyze.rsa.analyze(problem_dict, sp.samples, total_cost)
+    sp.heatmap()
+    fig.set_size_inches(10, 4)
+    plt.savefig(figures_path + "operational_cost_pawn_heatmap_SA.png")

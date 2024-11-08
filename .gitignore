@@ -1,6 +1,7 @@
 # Ignore sample files and cost model docs
 *samples*.csv
 /Cost Models/*.xlsx
+/figures/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
