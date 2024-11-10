@@ -1,4 +1,4 @@
-import decimal
+import decimal, json
 from SALib import ProblemSpec
 import numpy as np
 import matplotlib.pyplot as plt
@@ -103,19 +103,33 @@ def calculate_production_cost(wb, factors):
     return [Cost, setupCost, percoral_Cost, percoral_setupCost, YOEC_yield]
 
 
-def _problem_spec(factor_dict, is_cat):
+def load_config():
+    with open("config.json") as json_file:
+        json_data = json.load(json_file)
+
+    return json_data
+
+
+def problem_spec(cost_type):
     """
     Create a problem specification for sampling using SALib.
 
     Args:
-        factor_dict : A dictionary of factor names and ranges
-        is_cat : Boolian vector specifian whether each factor is categorical
+        cost_type : String specifying cost model type, "production_params" or "deployment_params"
 
     Returns:
         sp: ProblemSpec for sampling with SALib
         factor_names: List of factor names
         is_cat: Boolian vector specifian whether each factor is categorical.
     """
+    if (cost_type != "production_params") & (cost_type != "deployment_params"):
+        raise ValueError("Non-existent parameter type")
+
+    factor_specs = load_config()
+
+    factor_dict = factor_specs[cost_type]["factor_dict"]
+    is_cat = factor_specs[cost_type]["is_cat"]
+
     factor_names = [*factor_dict.keys()]
     problem_dict = {
         "num_vars": len(is_cat),
@@ -123,89 +137,6 @@ def _problem_spec(factor_dict, is_cat):
         "bounds": [*factor_dict.values()],
     }
     return ProblemSpec(problem_dict), factor_names, is_cat
-
-
-def deployment_problem_spec():
-    """
-    Create a problem specification for sampling deployment cost parameters using SALib.
-
-    Args:
-        factor_dict : A dictionary of factor names and ranges
-        is_cat : Boolian vector specifian whether each factor is categorical
-    """
-    factor_dict = {
-        "num_devices": [1.0, 100000000.0],
-        "port": [0.0, 4.0],
-        "deployment_dur": [20.0, 28.0],
-        "DAJ_a_r": [1.0, 4.0],
-        "DAJ_c_s": [1.0, 4.0],
-        "deck_space": [8.0, 15.0],
-        "distance_from_port": [13.0, 200.0],
-        "1YOEC_yield": [0.6, 0.8],
-        "secs_per_dev": [0.0, 4.0],
-        "bins_per_tender": [3.0, 7.0],
-        "proportion": [0.4, 0.6],
-        "cape_ferg_price": [12000, 15000],
-        "ship_endurance": [12.0, 16.0],
-    }
-
-    is_cat = [
-        True,
-        True,
-        True,
-        True,
-        True,
-        True,
-        False,
-        False,
-        False,
-        True,
-        False,
-        False,
-        True,
-    ]
-    return _problem_spec(factor_dict, is_cat)
-
-
-def production_problem_spec():
-    """
-    Create a problem specification for sampling production cost parameters using SALib.
-
-    Args:
-        factor_dict : A dictionary of factor names and ranges
-        is_cat : Boolian vector specifian whether each factor is categorical
-    """
-    factor_dict = {
-        "num_devices": [1.0, 100000000.0],
-        "colony_hold_time": [19.0, 23.0],
-        "species_no": [3.0, 24.0],
-        "col_spawn_gam_bun": [57600, 70400],
-        "gam_bun_egg": [10.0, 14.0],
-        "egg_embryo": [0.7, 0.9],
-        "embryo_freeswim": [0.7, 0.9],
-        "freeswim_settle": [0.7, 0.9],
-        "settle_just": [0.7, 0.9],
-        "just_unit": [6.0, 9.0],
-        "just_mature": [0.7, 0.9],
-        "1YOEC_yield": [0.6, 0.8],
-        "optimal_rear_dens": [1.0, 3.0],
-    }
-    is_cat = [
-        True,
-        True,
-        True,
-        True,
-        True,
-        False,
-        False,
-        False,
-        False,
-        True,
-        False,
-        False,
-        True,
-    ]
-    return _problem_spec(factor_dict, is_cat)
 
 
 def convert_factor_types(factors_df, is_cat):

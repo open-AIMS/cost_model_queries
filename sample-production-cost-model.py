@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 from sampling.sampling_functions import (
-    production_problem_spec,
+    problem_spec,
     convert_factor_types,
     sample_production_cost,
 )
@@ -19,7 +19,7 @@ wb_file_path = os.path.abspath(os.getcwd()) + file_name
 N = 2**10
 
 # Generate problem spec, factor names and list of categorical factors to create factor sample
-sp, factor_names, is_cat = production_problem_spec()
+sp, factor_names, is_cat = problem_spec("production_params")
 # Sample factors using sobal sampling
 sp.sample_sobol(N, calc_second_order=True)
 
