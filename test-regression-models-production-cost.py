@@ -3,9 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
-import plotting.LM_diagnostics as lmd
+import src.plotting.LM_diagnostics as lmd
 
-from plotting.data_plotting import plot_predictors, plot_predicted_vs_actual
+from src.plotting.data_plotting import plot_predictors, plot_predicted_vs_actual
 
 samples_fn = "production_cost_samples.csv"
 samples_df = pd.read_csv(samples_fn)

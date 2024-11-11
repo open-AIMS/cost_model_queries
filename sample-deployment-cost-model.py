@@ -2,7 +2,7 @@ import win32com.client
 import pandas as pd
 import os
 
-from sampling.sampling_functions import (
+from src.sampling.sampling_functions import (
     problem_spec,
     convert_factor_types,
     sample_deployment_cost,
