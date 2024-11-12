@@ -19,17 +19,24 @@ The excel files containing the cost models need to be placed in the **Cost Model
 Configuration
 -------------
 
-The file `config.json` sets the parameters names, sampling ranges and other information. To adjust sampling ranges
-and parameter names a new config file can be created and placed in the **src** folder. Parameters under the :py:obj:`production_params`
-key represent the parameters in the production costs model, while those under :py:obj:`deployment_params` represent those in the
-deployment costs model. :py:obj:`factors_dict` describes parameter ranges for sampling. :py:obj:`is_cat` is of the same length as the number
-of parameters for a given model and contains `True` for categorical variables and `False` for continuous variables.
+The file `config.csv` sets the parameters names, sampling ranges, and cells in the excel-based cost models. To adjust sampling ranges
+and parameter names a new config file can be created and placed in the project root. The config file is a csv with the following columns:
+    * `cost_type` : `production` or `deployment` model.
+    * `sheet` : the sheet the parameter is found on in the excel-based cost model.
+    * `names` : a shortened name for the parameter.
+    * `cell_row` : the row the parameter sits on in the model.
+    * `cell_col` : the column the parameter sits in in the model.
+    * `range_lower` : the lower limit of the parameter's sampling range.
+    * `range_upper` : the upper limit of the parameter's sampling range.
+    * `is_cat` : TRUE if the parameter is categorical, FALSE if not.
+
+The config file is loaded by :py:func:`sampling.sampling_functions.problem_spec` and used to sample predictors and calculate costs for samples.
 
 Sampling
 --------
 
 Parameter sampling is done using the `SALib <https://salib.readthedocs.io/en/latest/index.html>`_ package, with parameter sampling ranges defined in
-`config.json` in :py:obj:`factors_dict`. The input samples are then adusted to the correct types, using :py:func:`sampling.sampling_functions.convert_factor_types`.
+`config.csv`. The input samples are then adusted to the correct types, using :py:func:`sampling.sampling_functions.convert_factor_types`.
 In the example below, cost model sampling is carried out by the function, :py:func:`sampling.sampling_functions.sample_production_cost`,
 which saves the samples as a csv, here specified as `production_cost_samples.csv`. An example for the deployment costs is included in
 `sample-deployment-cost-model.py`.
