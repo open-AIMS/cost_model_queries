@@ -1,4 +1,3 @@
-import decimal
 from SALib import ProblemSpec
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,17 +22,17 @@ def calculate_deployment_cost(wb, factor_spec, factors):
 
     for _, factor_row in factor_spec.iterrows():
         ws = wb.Sheets(factor_row.sheet)
-        if factor_row.names == "distance_from_port":
+        if factor_row.factor_names == "distance_from_port":
             ws.Cells(factor_row.cell_row + port, factor_row.cell_col).Value = factors[
-                factor_row.names
+                factor_row.factor_names
             ].iloc[0]
-        elif factor_row.names == "port":
+        elif factor_row.factor_names == "port":
             ws.Cells(factor_row.cell_row, factor_row.cell_col).Value = reef_key[
                 port - 1
             ]
         else:
             ws.Cells(factor_row.cell_row, factor_row.cell_col).Value = factors[
-                factor_row.names
+                factor_row.factor_names
             ].iloc[0]
 
     ws = wb.Sheets("Dashboard")
@@ -64,7 +63,7 @@ def calculate_production_cost(wb, factor_spec, factors):
         ws = wb.Sheets(factor_row.sheet)
 
         ws.Cells(factor_row.cell_row, factor_row.cell_col).Value = factors[
-            factor_row.names
+            factor_row.factor_names
         ].iloc[0]
 
     ws = wb.Sheets("Dashboard")
@@ -105,7 +104,7 @@ def problem_spec(cost_type):
 
     problem_dict = {
         "num_vars": factor_specs.shape[0],
-        "names": factor_specs.names,
+        "names": [name for name in factor_specs.factor_names],
         "bounds": factor_ranges,
     }
     return ProblemSpec(problem_dict), factor_specs
@@ -176,7 +175,7 @@ def sample_production_cost(wb, factors_df, factor_spec, N):
 
     Args:
         wb : A cost model as an escel workbook
-        factors_df : Dataframe of ffactors to input in the cost model
+        factors_df : Dataframe of factors to input in the cost model
         factor_spec : factor specification, as loaded from the config.csv
         N: Number of samples input to SALib sampling function
 
@@ -186,12 +185,19 @@ def sample_production_cost(wb, factors_df, factor_spec, N):
     return _sample_cost(wb, factors_df, factor_spec, N, calculate_production_cost)
 
 
-def cost_sensitivity_analysis(
-    problem_spec_func, samples_fn, figures_path=".\\figures\\"
-):
+def cost_sensitivity_analysis(samples_fn, cost_type, figures_path=".\\src\\figures\\"):
+    """
+    Perform a sensitvity analysis with costs as output from a set of samples.
+
+    Args:
+        samples_fn : Filename/path of the samples.
+        cost_type : "production" or "deployment".
+        figures_path: where to save figures from the sensitvity analysis.
+    """
     samples_df = pd.read_csv(samples_fn)
-    sp, factor_spec = problem_spec_func()
-    factor_names = factor_spec.names
+    sp, factor_spec = problem_spec(cost_type)
+
+    factor_names = factor_spec.factor_names.values
     sp.samples = np.array(samples_df[factor_names])
 
     # First get sensitivity to setup cost

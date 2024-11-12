@@ -23,7 +23,7 @@ sp, factor_specs = problem_spec("deployment")
 # Sample factors using sobal sampling
 sp.sample_sobol(N, calc_second_order=True)
 
-factors_df = pd.DataFrame(data=sp.samples, columns=factor_specs.names)
+factors_df = pd.DataFrame(data=sp.samples, columns=factor_specs.factor_names)
 
 # Convert categorical factors to categories
 factors_df = convert_factor_types(factors_df, factor_specs.is_cat)

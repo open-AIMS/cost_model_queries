@@ -1,4 +1,4 @@
-﻿cost_type,sheet,names,cell_row,cell_col,range_lower,range_upper,is_cat
+﻿cost_type,sheet,factor_names,cell_row,cell_col,range_lower,range_upper,is_cat
 production,Dashboard,num_devices,5,5,1,100000000,TRUE
 production,Dashboard,species_no,10,5,19,23,TRUE
 production,Conversions,col_spawn_gam_bun,7,6,57600,70400,TRUE

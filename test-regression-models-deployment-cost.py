@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 import src.plotting.LM_diagnostics as lmd
 
@@ -13,13 +12,10 @@ init_x = samples_df[
     samples_df.columns[
         (samples_df.columns != "Cost")
         & (samples_df.columns != "setupCost")
-        & (samples_df.columns != "setupCost_percoral")
-        & (samples_df.columns != "Cost_percoral")
     ]
 ]
 
 init_x["port"] = init_x["port"].astype("category")
-init_x["YOEC_yield"] = init_x["1YOEC_yield"]
 
 # General review of potential relationships/correlations
 ax, fig = plot_predictors(init_x, samples_df.Cost)

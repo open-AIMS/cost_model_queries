@@ -23,7 +23,7 @@ The file `config.csv` sets the parameters names, sampling ranges, and cells in t
 and parameter names a new config file can be created and placed in the project root. The config file is a csv with the following columns:
     * `cost_type` : `production` or `deployment` model.
     * `sheet` : the sheet the parameter is found on in the excel-based cost model.
-    * `names` : a shortened name for the parameter.
+    * `factor_names` : a shortened name for the parameter.
     * `cell_row` : the row the parameter sits on in the model.
     * `cell_col` : the column the parameter sits in in the model.
     * `range_lower` : the lower limit of the parameter's sampling range.
