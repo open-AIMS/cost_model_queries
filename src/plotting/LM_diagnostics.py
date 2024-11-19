@@ -1,4 +1,3 @@
-# base code
 import numpy as np
 import seaborn as sns
 import statsmodels
@@ -61,14 +60,17 @@ class LinearRegDiagnostic:
 
         e. vif
 
-        Args:
+        Parameters
+        ----------
             results (Type[statsmodels.regression.linear_model.RegressionResultsWrapper]):
                 must be instance of statsmodels.regression.linear_model object
 
-        Raises:
+        Raises
+        ------
             TypeError: if instance does not belong to above object
 
-        Example:
+        Example
+        -------
         >>> import numpy as np
         >>> import pandas as pd
         >>> import statsmodels.formula.api as smf

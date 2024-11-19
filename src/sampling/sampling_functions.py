@@ -8,14 +8,21 @@ def calculate_deployment_cost(wb, factor_spec, factors):
     """
     Calculates set up and operational costs in the deployment cost model (wb), given a set of parameters to sample.
 
-    Args:
-        wb : The cost model as an excel workbook
-        factor_spec : factor specification, as loaded from the config.csv
-        factors : Row of a pandas dataframe with factors to sample
+    Parameters
+    ----------
+        wb : Workbook
+            The cost model as an excel workbook
+        factor_spec : dataframe
+            The factor specification, as loaded from the config.csv
+        factors : dataframerow
+            Row of a pandas dataframe with factors to sample
 
-    Returns:
-        Cost: Operational cost
-        setupCost: Setup cost
+    Returns
+    -------
+        Cost: float
+            Operational cost
+        setupCost: float
+            Setup cost
     """
     reef_key = ["Moore", "Davies", "Swains", "Keppel"]
     port = factors["port"].iloc[0]
@@ -50,14 +57,21 @@ def calculate_production_cost(wb, factor_spec, factors):
     """
     Calculates set up and operational costs in the production cost model (wb), given a set of parameters to sample.
 
-    Args:
-        wb : The cost model as an excel workbook
-        factor_spec : factor specification, as loaded from the config.csv
-        factors : Row of a pandas dataframe with factors to sample
+    Parameters
+    ----------
+        wb : Workbook
+            The cost model as an excel workbook
+        factor_spec : dataframe
+            factor specification, as loaded from the config.csv
+        factors : dataframerow
+            Row of a pandas dataframe with factors to sample
 
-    Returns:
-        Cost: Operational cost
-        setupCost: Setup cost
+    Returns
+    -------
+        Cost: float
+            Operational cost
+        setupCost: float
+            Setup cost
     """
     for _, factor_row in factor_spec.iterrows():
         ws = wb.Sheets(factor_row.sheet)
@@ -85,12 +99,17 @@ def problem_spec(cost_type):
     """
     Create a problem specification for sampling using SALib.
 
-    Args:
-        cost_type : String specifying cost model type, "production_params" or "deployment_params"
+    Parameters
+    ----------
+        cost_type : str
+            String specifying cost model type, "production_params" or "deployment_params"
 
-    Returns:
-        sp: ProblemSpec for sampling with SALib
-        factor_spec : factor specification, as loaded from the config.csv
+    Returns
+    -------
+        sp: dict
+            ProblemSpec for sampling with SALib
+        factor_spec : dataframe
+            factor specification, as loaded from the config.csv
     """
     if (cost_type != "production") & (cost_type != "deployment"):
         raise ValueError("Non-existent parameter type")
@@ -114,9 +133,12 @@ def convert_factor_types(factors_df, is_cat):
     """
     SALib samples floats, so convert categorical variables to integers by taking the ceiling.
 
-    Args:
-        factors_df : A dataframe of sampled factors
-        is_cat : Boolian vector specifian whether each factor is categorical
+    Parameters
+    ----------
+        factors_df : dataframe
+            A dataframe of sampled factors
+        is_cat : list{bool}
+            Boolian vector specifian whether each factor is categorical
 
     Returns:
         factors_df: Updated sampled factor dataframe with categorical factors as integers
@@ -134,15 +156,23 @@ def _sample_cost(wb, factors_df, factor_spec, N, calculate_cost):
     """
     Sample a cost model.
 
-    Args:
-        wb : A cost model as an escel workbook
-        factors_df : Dataframe of ffactors to input in the cost model
-        factor_spec : factor specification, as loaded from the config.csv
-        N: Number of samples input to SALib sampling function
-        calculate_cost: Function to use to sample cost
+    Parameters
+    ----------
+        wb : Workbook
+            A cost model as an excel workbook
+        factors_df : dataframe
+            Dataframe of factors to input in the cost model
+        factor_spec : dataframe
+            factor specification, as loaded from the config.csv
+        N : int
+            Number of samples input to SALib sampling function
+        calculate_cost: function
+            Function to use to sample cost
 
-    Returns:
-        factors_df: Updated sampled factor dataframe with costs added
+    Returns
+    -------
+        factors_df : dataframe
+            Updated sampled factor dataframe with costs added
     """
     total_cost = np.zeros((N * (2 * (factors_df.shape[1]) + 2), 2))
     for idx_n in range(len(total_cost)):
@@ -157,14 +187,21 @@ def sample_deployment_cost(wb, factors_df, factor_spec, N):
     """
     Sample the deployment cost model.
 
-    Args:
-        wb : A cost model as an escel workbook
-        factors_df : Dataframe of ffactors to input in the cost model
-        factor_spec : factor specification, as loaded from the config.csv
-        N: Number of samples input to SALib sampling function
+    Parameters
+    ----------
+        wb : Workbook
+            A cost model as an escel workbook
+        factors_df : dataframe
+            Dataframe of factors to input in the cost model
+        factor_spec : dataframe
+            factor specification, as loaded from the config.csv
+        N : int
+            Number of samples input to SALib sampling function
 
-    Returns:
-        factors_df: Updated sampled factor dataframe with costs added
+    Returns
+    -------
+        factors_df : dataframe
+            Updated sampled factor dataframe with costs added
     """
     return _sample_cost(wb, factors_df, factor_spec, N, calculate_deployment_cost)
 
@@ -173,14 +210,21 @@ def sample_production_cost(wb, factors_df, factor_spec, N):
     """
     Sample the production cost model.
 
-    Args:
-        wb : A cost model as an escel workbook
-        factors_df : Dataframe of factors to input in the cost model
-        factor_spec : factor specification, as loaded from the config.csv
-        N: Number of samples input to SALib sampling function
+    Parameters
+    ----------
+        wb : Workbook
+            A cost model as an excel workbook
+        factors_df : dataframe
+            Dataframe of factors to input in the cost model
+        factor_spec : dataframe
+            Factor specification, as loaded from the config.csv
+        N : int
+            Number of samples input to SALib sampling function
 
-    Returns:
-        factors_df: Updated sampled factor dataframe with costs added
+    Returns
+    -------
+        factors_df : dataframe
+            Updated sampled factor dataframe with costs added
     """
     return _sample_cost(wb, factors_df, factor_spec, N, calculate_production_cost)
 
@@ -189,10 +233,14 @@ def cost_sensitivity_analysis(samples_fn, cost_type, figures_path=".\\src\\figur
     """
     Perform a sensitvity analysis with costs as output from a set of samples.
 
-    Args:
-        samples_fn : Filename/path of the samples.
-        cost_type : "production" or "deployment".
-        figures_path: where to save figures from the sensitvity analysis.
+    Parameters
+    ----------
+        samples_fn : str
+            Filename/path of the samples.
+        cost_type : str
+            "production" or "deployment".
+        figures_path : str
+            Path to save figures from the sensitvity analysis.
     """
     samples_df = pd.read_csv(samples_fn)
     sp, factor_spec = problem_spec(cost_type)
