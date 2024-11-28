@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
 import src.plotting.LM_diagnostics as lmd
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.plotting.data_plotting import plot_predictors, plot_predicted_vs_actual
 
@@ -15,8 +18,6 @@ init_x = samples_df[
     samples_df.columns[
         (samples_df.columns != "Cost")
         & (samples_df.columns != "setupCost")
-        & (samples_df.columns != "setupCost_percoral")
-        & (samples_df.columns != "Cost_percoral")
     ]
 ]
 init_x["YOEC_yield"] = init_x["1YOEC_yield"]
@@ -78,8 +79,6 @@ init_x = samples_df[
     samples_df.columns[
         (samples_df.columns != "Cost")
         & (samples_df.columns != "setupCost")
-        & (samples_df.columns != "setupCost_percoral")
-        & (samples_df.columns != "Cost_percoral")
     ]
 ]
 init_x["YOEC_yield"] = init_x["1YOEC_yield"]

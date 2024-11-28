@@ -1,6 +1,7 @@
-import win32com.client
 import pandas as pd
 import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.sampling.sampling_functions import (
     problem_spec,
@@ -29,8 +30,5 @@ factors_df = pd.DataFrame(data=sp.samples, columns=factor_specs.factor_names)
 factors_df = convert_factor_types(factors_df, factor_specs.is_cat)
 
 # Sample cost using factors sampled
-xlApp = win32com.client.Dispatch("Excel.Application")  # Open workbook
-wb = xlApp.Workbooks.Open(wb_file_path)
-factors_df = sample_deployment_cost(wb, factors_df, factor_specs, N)
+factors_df = sample_deployment_cost(wb_file_path, factors_df, factor_specs, N)
 factors_df.to_csv(samples_save_fn, index=False)  # Save to CSV
-wb.Close(True)  # Close workbook
