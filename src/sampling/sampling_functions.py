@@ -1,3 +1,4 @@
+import win32com.client
 from SALib import ProblemSpec
 import numpy as np
 import matplotlib.pyplot as plt
@@ -91,11 +92,19 @@ def calculate_production_cost(wb, factor_spec, factors):
     return [Cost, setupCost]
 
 
-def load_config():
-    return pd.read_csv("config.csv")
+def load_config(config_filepath="config.csv"):
+    """
+    Load configuration file for model sampling
+
+    Parameters
+    ----------
+        config_filepath : str
+            String specifying filepath of config file, default is the default package config file
+    """
+    return pd.read_csv(config_filepath)
 
 
-def problem_spec(cost_type):
+def problem_spec(cost_type, config_filepath="config.csv"):
     """
     Create a problem specification for sampling using SALib.
 
@@ -103,6 +112,8 @@ def problem_spec(cost_type):
     ----------
         cost_type : str
             String specifying cost model type, "production_params" or "deployment_params"
+        config_filepath : str
+            String specifying filepath of config file, default is the default package config file
 
     Returns
     -------
@@ -114,7 +125,7 @@ def problem_spec(cost_type):
     if (cost_type != "production") & (cost_type != "deployment"):
         raise ValueError("Non-existent parameter type")
 
-    factor_specs = load_config()
+    factor_specs = load_config(config_filepath=config_filepath)
     factor_specs = factor_specs[factor_specs.cost_type == cost_type]
     factor_ranges = [
         factor_specs[["range_lower", "range_upper"]].iloc[k].values
@@ -152,14 +163,14 @@ def convert_factor_types(factors_df, is_cat):
     return factors_df
 
 
-def _sample_cost(wb, factors_df, factor_spec, N, calculate_cost):
+def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost):
     """
     Sample a cost model.
 
     Parameters
     ----------
-        wb : Workbook
-            A cost model as an excel workbook
+        wb_file_path : str
+            Filepath to a cost model as an excel workbook
         factors_df : dataframe
             Dataframe of factors to input in the cost model
         factor_spec : dataframe
@@ -174,23 +185,28 @@ def _sample_cost(wb, factors_df, factor_spec, N, calculate_cost):
         factors_df : dataframe
             Updated sampled factor dataframe with costs added
     """
+    xlApp = win32com.client.Dispatch("Excel.Application")  # Open workbook
+    wb = xlApp.Workbooks.Open(wb_file_path)
+
     total_cost = np.zeros((N * (2 * (factors_df.shape[1]) + 2), 2))
     for idx_n in range(len(total_cost)):
         total_cost[idx_n, :] = calculate_cost(wb, factor_spec, factors_df.iloc[[idx_n]])
 
     factors_df.insert(1, "Cost", total_cost[:, 0])
     factors_df.insert(1, "setupCost", total_cost[:, 1])
+
+    wb.Close(True)  # Close workbook
     return factors_df
 
 
-def sample_deployment_cost(wb, factors_df, factor_spec, N):
+def sample_deployment_cost(wb_file_path, factors_df, factor_spec, N):
     """
     Sample the deployment cost model.
 
     Parameters
     ----------
-        wb : Workbook
-            A cost model as an escel workbook
+        wb_file_path : str
+            Filepath to a cost model as an excel workbook
         factors_df : dataframe
             Dataframe of factors to input in the cost model
         factor_spec : dataframe
@@ -203,16 +219,16 @@ def sample_deployment_cost(wb, factors_df, factor_spec, N):
         factors_df : dataframe
             Updated sampled factor dataframe with costs added
     """
-    return _sample_cost(wb, factors_df, factor_spec, N, calculate_deployment_cost)
+    return _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_deployment_cost)
 
 
-def sample_production_cost(wb, factors_df, factor_spec, N):
+def sample_production_cost(wb_file_path, factors_df, factor_spec, N):
     """
     Sample the production cost model.
 
     Parameters
     ----------
-        wb : Workbook
+        wb_file_path : Workbook file path
             A cost model as an excel workbook
         factors_df : dataframe
             Dataframe of factors to input in the cost model
@@ -226,7 +242,7 @@ def sample_production_cost(wb, factors_df, factor_spec, N):
         factors_df : dataframe
             Updated sampled factor dataframe with costs added
     """
-    return _sample_cost(wb, factors_df, factor_spec, N, calculate_production_cost)
+    return _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_production_cost)
 
 
 def cost_sensitivity_analysis(samples_fn, cost_type, figures_path=".\\src\\figures\\"):
