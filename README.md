@@ -7,8 +7,7 @@ Cost Model Queries facilitates sampling, sensitivity analyses and regression mod
 ### Installation
 
 ```console
-    (base) $ conda env create --name environment_name -f environment.yml
-    (base) $ conda activate environment_name
+    (base) $ pip install cost_model_queries
 ```
 
 Details on usage and the API are available in the [Documentation](https://cost-model-queries.readthedocs.io/en/latest/).
