@@ -1,4 +1,4 @@
-# cost-model-queries
+# cost_model_queries
 
 [![Documentation Status](https://readthedocs.org/projects/cost-model-queries/badge/?version=latest)](https://cost-model-queries.readthedocs.io/en/latest/?badge=latest)
 

@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
 def calculate_deployment_cost(wb, factor_spec, factors):
     """
     Calculates set up and operational costs in the deployment cost model (wb), given a set of parameters to sample.
@@ -163,7 +162,7 @@ def convert_factor_types(factors_df, is_cat):
     return factors_df
 
 
-def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost):
+def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost, n_factors):
     """
     Sample a cost model.
 
@@ -188,7 +187,7 @@ def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost):
     xlApp = win32com.client.Dispatch("Excel.Application")  # Open workbook
     wb = xlApp.Workbooks.Open(wb_file_path)
 
-    total_cost = np.zeros((N * (2 * (factors_df.shape[1]) + 2), 2))
+    total_cost = np.zeros((N * (2 * n_factors + 2), 2))
     for idx_n in range(len(total_cost)):
         total_cost[idx_n, :] = calculate_cost(wb, factor_spec, factors_df.iloc[[idx_n]])
 
@@ -199,7 +198,7 @@ def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost):
     return factors_df
 
 
-def sample_deployment_cost(wb_file_path, factors_df, factor_spec, N):
+def sample_deployment_cost(wb_file_path, factors_df, factor_spec, N, **kwargs):
     """
     Sample the deployment cost model.
 
@@ -219,10 +218,11 @@ def sample_deployment_cost(wb_file_path, factors_df, factor_spec, N):
         factors_df : dataframe
             Updated sampled factor dataframe with costs added
     """
-    return _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_deployment_cost)
+    n_factors = kwargs.get('n_factors', factors_df.shape[1])
+    return _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_deployment_cost, n_factors=n_factors)
 
 
-def sample_production_cost(wb_file_path, factors_df, factor_spec, N):
+def sample_production_cost(wb_file_path, factors_df, factor_spec, N, **kwargs):
     """
     Sample the production cost model.
 
@@ -242,7 +242,8 @@ def sample_production_cost(wb_file_path, factors_df, factor_spec, N):
         factors_df : dataframe
             Updated sampled factor dataframe with costs added
     """
-    return _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_production_cost)
+    n_factors = kwargs.get('n_factors', factors_df.shape[1])
+    return _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_production_cost, n_factors=n_factors)
 
 
 def cost_sensitivity_analysis(samples_fn, cost_type, figures_path=".\\src\\figures\\"):
