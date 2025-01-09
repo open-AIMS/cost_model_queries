@@ -8,8 +8,7 @@ To use Cost Model Queries, the evironment must first be installed from the `envi
 
 .. code-block:: console
 
-    (base) $ conda env create --name environment_name -f environment.yml
-    (base) $ conda activate environment_name
+    (base) $ pip install cost_model_queries
 
 Code structure
 --------------
@@ -21,6 +20,7 @@ Configuration
 
 The file `config.csv` sets the parameters names, sampling ranges, and cells in the excel-based cost models. To adjust sampling ranges
 and parameter names a new config file can be created and placed in the project root. The config file is a csv with the following columns:
+
     * `cost_type` : `production` or `deployment` model.
     * `sheet` : the sheet the parameter is found on in the excel-based cost model.
     * `factor_names` : a shortened name for the parameter.
@@ -39,9 +39,9 @@ Parameter sampling is done using the `SALib <https://salib.readthedocs.io/en/lat
 `config.csv`. The input samples are then adusted to the correct types, using :py:func:`sampling.sampling_functions.convert_factor_types`.
 In the example below, cost model sampling is carried out by the function, :py:func:`sampling.sampling_functions.sample_production_cost`,
 which saves the samples as a csv, here specified as `production_cost_samples.csv`. An example for the deployment costs is included in
-`sample-deployment-cost-model.py`.
+`sample_deployment_cost_model.py`.
 
-.. literalinclude:: ../../sample-production-cost-model.py
+.. literalinclude:: ../../examples/sample_production_cost_model.py
    :language: python
    :linenos:
 
@@ -53,7 +53,7 @@ package. In the example below, the files `production_cost_samples.csv` and `depl
 described above. The function :py:func:`sampling.sampling_functions.cost_sensitvity_analysis` generates a series of figures which are saved in
 the **figures** folder, including bar plots and heatmaps of the Pawn and Sobol sensitvity analysis results.
 
-.. literalinclude:: ../../SA-cost-models.py
+.. literalinclude:: ../../examples/SA_cost_models.py
    :language: python
    :linenos:
 
@@ -65,8 +65,8 @@ packages `statsmodels <https://www.statsmodels.org/stable/index.html>`_ and `sci
 For exploring potential models, predictors can be plotted against cost using :py:func:`plotting.data_plotting.plot_predictors`.
 A series of functions for testing the assumptions of linear regression are also included in :py:mod:`plotting.LM_diagnostics`,
 including QQplots, location vs. scale and residuals plots. The example below shows the process of fitting linear regression models
-to samples from the deployment cost model and checking assumptions. An example for the production cost is included in `test-regression-models-production-cost.py`.
+to samples from the deployment cost model and checking assumptions. An example for the production cost is included in `test_regression_models_production_cost.py`.
 
-.. literalinclude:: ../../test-regression-models-deployment-cost.py
+.. literalinclude:: ../../examples/test_regression_models_deployment_cost.py
    :language: python
    :linenos:
