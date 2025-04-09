@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version < '3.11' and sys_platform == 'windows'",
@@ -74,8 +75,8 @@ wheels = [
 ]
 
 [[package]]
-name = "cost_model_queries"
-version = "0.0.6"
+name = "cost-model-queries"
+version = "0.0.8"
 source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
@@ -533,7 +534,7 @@ wheels = [
 
 [[package]]
 name = "pywin32"
-version = "305"
+version = "310"
 source = { registry = "https://pypi.org/simple" }
 
 [[package]]
