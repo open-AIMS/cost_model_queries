@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.sampling.sampling_functions import (
+from cost_model_queries.sampling.sampling_functions import (
     problem_spec,
     convert_factor_types,
     sample_production_cost,
