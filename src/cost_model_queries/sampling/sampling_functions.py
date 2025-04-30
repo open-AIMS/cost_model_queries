@@ -27,7 +27,7 @@ def calculate_deployment_cost(wb, factor_spec, factors):
     reef_key = ["Moore", "Davies", "Swains", "Keppel"]
     port = factors["port"].iloc[0]
 
-    for _, factor_row in factor_spec.iterrows():
+    for _, factor_row in factor_spec[(factor_spec.factor_names!="Cost")&(factor_spec.factor_names!="setupCost")].iterrows():
         ws = wb.Sheets(factor_row.sheet)
         if factor_row.factor_names == "distance_from_port":
             ws.Cells(factor_row.cell_row + port, factor_row.cell_col).Value = factors[
@@ -47,8 +47,10 @@ def calculate_deployment_cost(wb, factor_spec, factors):
     ws.Calculate()
 
     # get the new output
-    Cost = ws.Cells(6, 11).Value
-    setupCost = ws.Cells(11, 11).Value
+    cost_cells = factor_spec.loc[factor_spec.factor_names=="Cost"]
+    setupcost_cells = factor_spec.loc[factor_spec.factor_names=="setupCost"]
+    Cost = ws.Cells(cost_cells.cell_row.iloc[0], cost_cells.cell_col.iloc[0]).Value
+    setupCost = ws.Cells(setupcost_cells.cell_row.iloc[0], setupcost_cells.cell_col.iloc[0]).Value
 
     return [Cost, setupCost]
 
@@ -73,7 +75,7 @@ def calculate_production_cost(wb, factor_spec, factors):
         setupCost: float
             Setup cost
     """
-    for _, factor_row in factor_spec.iterrows():
+    for _, factor_row in factor_spec[(factor_spec.factor_names!="Cost")&(factor_spec.factor_names!="setupCost")].iterrows():
         ws = wb.Sheets(factor_row.sheet)
 
         ws.Cells(factor_row.cell_row, factor_row.cell_col).Value = factors[
@@ -85,8 +87,10 @@ def calculate_production_cost(wb, factor_spec, factors):
     ws.Calculate()
 
     # get the new output
-    Cost = ws.Cells(13, 12).Value
-    setupCost = ws.Cells(11, 12).Value
+    cost_cells = factor_spec.loc[factor_spec.factor_names=="Cost"]
+    setupcost_cells = factor_spec.loc[factor_spec.factor_names=="setupCost"]
+    Cost = ws.Cells(cost_cells.cell_row.iloc[0], cost_cells.cell_col.iloc[0]).Value
+    setupCost = ws.Cells(setupcost_cells.cell_row.iloc[0], setupcost_cells.cell_col.iloc[0]).Value
 
     return [Cost, setupCost]
 
@@ -191,8 +195,8 @@ def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost, n_fac
     for idx_n in range(len(total_cost)):
         total_cost[idx_n, :] = calculate_cost(wb, factor_spec, factors_df.iloc[[idx_n]])
 
-    factors_df.insert(1, "Cost", total_cost[:, 0])
-    factors_df.insert(1, "setupCost", total_cost[:, 1])
+    factors_df.loc[:, "Cost"] = total_cost[:, 0]
+    factors_df.loc[:, "setupCost"] = total_cost[:, 1]
 
     wb.Close(True)  # Close workbook
     return factors_df
