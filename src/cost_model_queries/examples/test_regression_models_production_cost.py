@@ -3,12 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 import statsmodels.api as sm
-import src.plotting.LM_diagnostics as lmd
-import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import cost_model_queries.plotting.LM_diagnostics as lmd
 
-from src.plotting.data_plotting import plot_predictors, plot_predicted_vs_actual
+from cost_model_queries.plotting.data_plotting import plot_predictors, plot_predicted_vs_actual
 
 samples_fn = "production_cost_samples.csv"
 samples_df = pd.read_csv(samples_fn)
