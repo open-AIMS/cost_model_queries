@@ -191,7 +191,7 @@ def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost, n_fac
     xlApp = win32com.client.Dispatch("Excel.Application")  # Open workbook
     wb = xlApp.Workbooks.Open(wb_file_path)
 
-    total_cost = np.zeros((N * (2 * n_factors + 2), 2))
+    total_cost = np.zeros((int(N * (2 * n_factors + 2)), 2))
     for idx_n in range(len(total_cost)):
         total_cost[idx_n, :] = calculate_cost(wb, factor_spec, factors_df.iloc[[idx_n]])
 
