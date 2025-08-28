@@ -5,7 +5,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.sampling.sampling_functions import (
+from cost_model_queries.sampling.sampling_functions import (
     problem_spec,
     convert_factor_types,
     sample_deployment_cost,
@@ -33,7 +33,7 @@ def test_sampling(cost_function, model_type, file_name):
     # Check any conversions to Int have worked
     assert all(check_types)
 
-    factors_df = cost_function(wb_file_path, factors_df, factor_specs, N)
+    factors_df = cost_function(wb_file_path, factors_df, factor_specs)
     check_sample = [math.isnan(factors_df[factor_specs.factor_names].iloc[[0]][k][0]) for k in factor_specs.factor_names]
 
     # Check sampling has worked (no Nans due to sampling empty cells)
@@ -49,4 +49,3 @@ test_sampling(sample_deployment_cost, "deployment", "\\tests\\test_deployment_co
 
 # Test production model sampling
 test_sampling(sample_production_cost, "production", "\\tests\\test_production_cost_model.xlsx")
-breakpoint()

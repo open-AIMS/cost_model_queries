@@ -166,7 +166,7 @@ def convert_factor_types(factors_df, is_cat):
     return factors_df
 
 
-def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost, n_factors):
+def _sample_cost(wb_file_path, factors_df, factor_spec, calculate_cost):
     """
     Sample a cost model.
 
@@ -178,8 +178,6 @@ def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost, n_fac
             Dataframe of factors to input in the cost model
         factor_spec : dataframe
             factor specification, as loaded from the config.csv
-        N : int
-            Number of samples input to SALib sampling function
         calculate_cost: function
             Function to use to sample cost
 
@@ -191,7 +189,7 @@ def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost, n_fac
     xlApp = win32com.client.Dispatch("Excel.Application")  # Open workbook
     wb = xlApp.Workbooks.Open(wb_file_path)
 
-    total_cost = np.zeros((int(N * (2 * n_factors + 2)), 2))
+    total_cost = np.zeros((factors_df.shape[0], 2))
     for idx_n in range(len(total_cost)):
         total_cost[idx_n, :] = calculate_cost(wb, factor_spec, factors_df.iloc[[idx_n]])
 
@@ -202,7 +200,7 @@ def _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_cost, n_fac
     return factors_df
 
 
-def sample_deployment_cost(wb_file_path, factors_df, factor_spec, N, **kwargs):
+def sample_deployment_cost(wb_file_path, factors_df, factor_spec):
     """
     Sample the deployment cost model.
 
@@ -214,19 +212,16 @@ def sample_deployment_cost(wb_file_path, factors_df, factor_spec, N, **kwargs):
             Dataframe of factors to input in the cost model
         factor_spec : dataframe
             factor specification, as loaded from the config.csv
-        N : int
-            Number of samples input to SALib sampling function
 
     Returns
     -------
         factors_df : dataframe
             Updated sampled factor dataframe with costs added
     """
-    n_factors = kwargs.get('n_factors', factors_df.shape[1])
-    return _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_deployment_cost, n_factors=n_factors)
+    return _sample_cost(wb_file_path, factors_df, factor_spec, calculate_deployment_cost)
 
 
-def sample_production_cost(wb_file_path, factors_df, factor_spec, N, **kwargs):
+def sample_production_cost(wb_file_path, factors_df, factor_spec):
     """
     Sample the production cost model.
 
@@ -238,16 +233,13 @@ def sample_production_cost(wb_file_path, factors_df, factor_spec, N, **kwargs):
             Dataframe of factors to input in the cost model
         factor_spec : dataframe
             Factor specification, as loaded from the config.csv
-        N : int
-            Number of samples input to SALib sampling function
 
     Returns
     -------
         factors_df : dataframe
             Updated sampled factor dataframe with costs added
     """
-    n_factors = kwargs.get('n_factors', factors_df.shape[1])
-    return _sample_cost(wb_file_path, factors_df, factor_spec, N, calculate_production_cost, n_factors=n_factors)
+    return _sample_cost(wb_file_path, factors_df, factor_spec, calculate_production_cost)
 
 
 def cost_sensitivity_analysis(samples_fn, cost_type, figures_path=".\\src\\figures\\"):
