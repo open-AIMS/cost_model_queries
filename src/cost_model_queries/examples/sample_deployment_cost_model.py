@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 from cost_model_queries.sampling.sampling_functions import (
     problem_spec,
@@ -27,5 +28,5 @@ factors_df = pd.DataFrame(data=sp.samples, columns=factor_specs.factor_names)
 factors_df = convert_factor_types(factors_df, factor_specs.is_cat)
 
 # Sample cost using factors sampled
-factors_df = sample_deployment_cost(wb_file_path, factors_df, factor_specs, N)
+factors_df = sample_deployment_cost(wb_file_path, factors_df, factor_specs)
 factors_df.to_csv(samples_save_fn, index=False)  # Save to CSV
