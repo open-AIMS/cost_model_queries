@@ -1,6 +1,6 @@
 [project]
 name = "cost_model_queries"
-version = "0.0.11"
+version = "0.0.12"
 description = "Functions for sampling cost models and performing sensitivity analyses and regressions on cost model data."
 readme = "README.md"
 requires-python = ">=3.10"
