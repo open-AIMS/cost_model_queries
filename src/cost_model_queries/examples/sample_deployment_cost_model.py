@@ -11,11 +11,11 @@ from cost_model_queries.sampling.sampling_functions import (
 samples_save_fn = "deployment_cost_samples.csv"
 
 # Path to cost model
-file_name = "\\Cost Models\\3.5.3 CA Deployment Model.xlsx"
+file_name = "\\Cost Models\\3.5.5 CA Deployment Model.xlsx"
 wb_file_path = os.path.abspath(os.getcwd()) + file_name
 
 # Generate sample
-N = 2**10
+N = 2**5
 
 # Generate problem spec, factor names and list of categorical factors to create factor sample
 sp, factor_specs = problem_spec("deployment")
